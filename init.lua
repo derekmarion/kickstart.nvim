@@ -705,6 +705,33 @@ do
 
     stylua = {}, -- Used to format Lua code
 
+    -- Typescript
+    vtsls = {
+      settings = {
+        typescript = {
+          inlayHints = {
+            parameterNames = { enabled = 'all' },
+            parameterTypes = { enabled = true },
+            variableTypes = { enabled = true },
+            propertyDeclarationTypes = { enabled = true },
+            functionLikeReturnTypes = { enabled = true },
+            enumMemberValues = { enabled = true },
+          },
+          preferences = {
+            includePackageJsonAutoImports = 'auto',
+          },
+          updateImportsOnFileMove = { enabled = 'always' },
+        },
+        javascript = {
+          inlayHints = {
+            parameterNames = { enabled = 'all' },
+            variableTypes = { enabled = true },
+          },
+        },
+      },
+    },
+    eslint = {},
+
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
       on_init = function(client)
@@ -762,6 +789,7 @@ do
   -- You can press `g?` for help in this menu.
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
+    'prettierd',
     -- You can add other tools here that you want Mason to install
   })
 
@@ -804,7 +832,13 @@ do
       -- python = { "isort", "black" },
       --
       -- You can use 'stop_after_first' to run the first available formatter from the list
-      -- javascript = { "prettierd", "prettier", stop_after_first = true },
+      javascript = { 'prettierd', 'prettier', stop_after_first = true },
+      typescript = { 'prettierd', 'prettier', stop_after_first = true },
+      javascriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      typescriptreact = { 'prettierd', 'prettier', stop_after_first = true },
+      json = { 'prettierd', 'prettier', stop_after_first = true },
+      css = { 'prettierd', 'prettier', stop_after_first = true },
+      html = { 'prettierd', 'prettier', stop_after_first = true },
     },
   }
 
