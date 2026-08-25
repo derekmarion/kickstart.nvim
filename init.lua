@@ -327,7 +327,8 @@ local function gh(repo) return 'https://github.com/' .. repo end
 
 -- ============================================================
 -- SECTION 4: UI / CORE UX PLUGINS
--- guess-indent, gitsigns, which-key, colorscheme, todo-comments, mini modules
+-- guess-indent, gitsigns, which-key, colorscheme, todo-comments, mini modules,
+-- neoscroll
 -- ============================================================
 do
   -- [[ Installing and Configuring Plugins ]]
@@ -447,6 +448,28 @@ do
 
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
+
+  -- Neoscroll for smooth scrolling animations
+  vim.pack.add { gh 'karb94/neoscroll.nvim' }
+
+  require('neoscroll').setup {
+    mappings = {
+      '<C-u>',
+      '<C-d>',
+      '<C-b>',
+      '<C-f>',
+      '<C-y>',
+      '<C-e>',
+      'zt',
+      'zz',
+      'zb',
+    },
+    hide_cursor = true,
+    stop_eof = true,
+    respect_scrolloff = true,
+    cursor_scrolls_alone = true,
+    easing_function = 'quadratic',
+  }
 end
 
 -- ============================================================
