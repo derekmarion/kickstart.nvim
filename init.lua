@@ -251,6 +251,34 @@ do
     group = vim.api.nvim_create_augroup('kickstart-highlight-yank', { clear = true }),
     callback = function() vim.hl.on_yank() end,
   })
+
+  -- Use tabs instead of spaces in LiveRead projects
+  vim.api.nvim_create_autocmd({ 'FileType', 'BufEnter' }, {
+    desc = 'Use tabs for Python files in selected project dirs',
+    group = vim.api.nvim_create_augroup('python-project-tabs', { clear = true }),
+    pattern = 'python',
+    callback = function(args)
+      local tab_python_dirs = {
+        vim.env.DANGERFIELD_DIR,
+        vim.env.RICKLES_DIR,
+      }
+      local filename = vim.fs.normalize(vim.api.nvim_buf_get_name(args.buf))
+      local function is_under_dir(file, dir)
+        if not dir or dir == '' then return false end
+        dir = vim.fs.normalize(dir)
+        return file == dir or vim.startswith(file, dir .. '/')
+      end
+      for _, dir in ipairs(tab_python_dirs) do
+        if is_under_dir(filename, dir) then
+          vim.bo[args.buf].expandtab = false
+          vim.bo[args.buf].tabstop = 4
+          vim.bo[args.buf].shiftwidth = 4
+          vim.bo[args.buf].softtabstop = 0
+          return
+        end
+      end
+    end,
+  })
 end
 
 -- ============================================================
