@@ -343,6 +343,18 @@ do
         vim.cmd 'TSUpdate'
         return
       end
+
+      if name == 'markdown-preview.nvim' then
+        local app_dir = vim.fs.joinpath(ev.data.path, 'app')
+        if vim.fn.executable 'yarn' == 1 then
+          run_build(name, { 'yarn', 'install' }, app_dir)
+        elseif vim.fn.executable 'npm' == 1 then
+          run_build(name, { 'npm', 'install' }, app_dir)
+        else
+          vim.notify('Build skipped for markdown-preview.nvim: yarn or npm is required.', vim.log.levels.WARN)
+        end
+        return
+      end
     end,
   })
 end
@@ -466,9 +478,30 @@ do
   --  and try some other statusline plugin
   local statusline = require 'mini.statusline'
   -- Set `use_icons` to true if you have a Nerd Font
-  statusline.setup { use_icons = vim.g.have_nerd_font }
+  statusline.setup {
+    use_icons = vim.g.have_nerd_font,
+    content = {
+      active = function()
+        local mode, mode_hl = statusline.section_mode { trunc_width = 120 }
+        local git = statusline.section_git { trunc_width = 0, icon = '' }
+        local diff = statusline.section_diff { trunc_width = 75 }
+        local diagnostics = statusline.section_diagnostics { trunc_width = 75 }
+        local filename = statusline.section_filename { trunc_width = 140 }
+        local fileinfo = statusline.section_fileinfo { trunc_width = 120 }
+        local location = statusline.section_location { trunc_width = 75 }
 
-  -- You can configure sections in the statusline by overriding their
+        return statusline.combine_groups {
+          { hl = mode_hl, strings = { mode } },
+          { hl = 'MiniStatuslineDevinfo', strings = { git, diff, diagnostics } },
+          '%<',
+          { hl = 'MiniStatuslineFilename', strings = { filename } },
+          '%=',
+          { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
+          { hl = mode_hl, strings = { location } },
+        }
+      end,
+    },
+  } -- You can configure sections in the statusline by overriding their
   -- default behavior. For example, here we set the section for
   -- cursor location to LINE:COLUMN
   ---@diagnostic disable-next-line: duplicate-set-field
@@ -743,10 +776,10 @@ do
   --  See `:help lsp-config` for information about keys and how to configure
   ---@type table<string, vim.lsp.Config>
   local servers = {
-    -- clangd = {},
+    clangd = {},
     -- gopls = {},
     -- pyright = {},
-    -- rust_analyzer = {},
+    rust_analyzer = {},
     --
     -- Some languages (like typescript) have entire language plugins that can be useful:
     --    https://github.com/pmizio/typescript-tools.nvim
@@ -845,6 +878,7 @@ do
   vim.list_extend(ensure_installed, {
     'prettierd',
     'ruff',
+    'clang-format',
     -- You can add other tools here that you want Mason to install
   })
 
@@ -895,6 +929,7 @@ do
       css = { 'prettierd', 'prettier', stop_after_first = true },
       html = { 'prettierd', 'prettier', stop_after_first = true },
       python = { 'ruff' },
+      c = { 'clang-format' },
     },
   }
 
