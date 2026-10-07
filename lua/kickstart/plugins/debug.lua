@@ -12,7 +12,6 @@ vim.pack.add {
   'https://github.com/nvim-neotest/nvim-nio',
   'https://github.com/mason-org/mason.nvim',
   'https://github.com/jay-babu/mason-nvim-dap.nvim',
-  'https://github.com/leoluz/nvim-dap-go',
 }
 
 -- Basic debugging keymaps, feel free to change to your liking!
@@ -41,7 +40,9 @@ require('mason-nvim-dap').setup {
   -- online, please don't ask me how to install them :)
   ensure_installed = {
     -- Update this to ensure that you have the debuggers for the langs you want
-    'delve',
+    'codelldb', -- C/C++/Rust
+    'js', -- Javascript
+    'python', -- Python
   },
 }
 
@@ -85,11 +86,29 @@ dap.listeners.after.event_initialized['dapui_config'] = dapui.open
 dap.listeners.before.event_terminated['dapui_config'] = dapui.close
 dap.listeners.before.event_exited['dapui_config'] = dapui.close
 
--- Install golang specific config
-require('dap-go').setup {
-  delve = {
-    -- On Windows delve must be run attached or it crashes.
-    -- See https://github.com/leoluz/nvim-dap-go/blob/main/README.md#configuring
-    detached = vim.fn.has 'win32' == 0,
-  },
-}
+-- Specify entrypoint for python program on launch
+-- Can be used to run tests in a django project, for example
+-- Inherits venv so activate or `uv run nvim`. The default
+-- runner uses the system python and doesn't have access to deps
+table.insert(
+  dap.configurations.python,
+  setmetatable({
+    type = 'python',
+    request = 'launch',
+    name = 'Specify Entrypoint',
+  }, {
+    __call = function(config)
+      local input = vim.fn.input('Run with args: ', 'manage.py test ')
+      local parts = vim.fn.split(input)
+      local script = table.remove(parts, 1)
+
+      return vim.tbl_extend('force', config, {
+        program = script and vim.fn.fnamemodify(script, ':p') or dap.ABORT,
+        args = parts,
+        cwd = vim.fn.getcwd(),
+        python = vim.fn.exepath 'python3',
+        console = 'integratedTerminal',
+      })
+    end,
+  })
+)
