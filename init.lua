@@ -823,8 +823,9 @@ do
     },
     oxlint = {},
 
-    -- Python
+    -- Python: ty checks types; Ruff reports lint diagnostics.
     ty = {},
+    ruff = {},
 
     -- Special Lua Config, as recommended by neovim help docs
     lua_ls = {
