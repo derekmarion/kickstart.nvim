@@ -255,9 +255,9 @@ do
     callback = function() vim.hl.on_yank() end,
   })
 
-  -- Use tabs instead of spaces in LiveRead projects
-  vim.api.nvim_create_autocmd({ 'FileType', 'BufEnter' }, {
-    desc = 'Use tabs for Python files in selected project dirs',
+  -- Use four-space indentation for Python, except in projects that require tabs.
+  vim.api.nvim_create_autocmd('FileType', {
+    desc = 'Set Python indentation (tabs in selected projects)',
     group = vim.api.nvim_create_augroup('python-project-tabs', { clear = true }),
     pattern = 'python',
     callback = function(args)
@@ -266,6 +266,10 @@ do
         vim.env.RICKLES_DIR,
       }
       local filename = vim.fs.normalize(vim.api.nvim_buf_get_name(args.buf))
+      vim.bo[args.buf].expandtab = true
+      vim.bo[args.buf].tabstop = 4
+      vim.bo[args.buf].shiftwidth = 4
+      vim.bo[args.buf].softtabstop = 4
       local function is_under_dir(file, dir)
         if not dir or dir == '' then return false end
         dir = vim.fs.normalize(dir)
@@ -388,7 +392,7 @@ do
   -- We first install it from https://github.com/NMAC427/guess-indent.nvim
   -- and then call its `setup()` function to start it with default settings.
   vim.pack.add { gh 'NMAC427/guess-indent.nvim' }
-  require('guess-indent').setup {}
+  require('guess-indent').setup { filetype_exclude = { 'python' } }
 
   -- Here is a more advanced configuration example that passes options to `gitsigns.nvim`
   --
@@ -880,7 +884,7 @@ do
   local ensure_installed = vim.tbl_keys(servers or {})
   vim.list_extend(ensure_installed, {
     'prettierd',
-    'ruff',
+    'ruff', -- Ruff CLI also provides Conform's ruff_format formatter
     'clang-format',
     -- You can add other tools here that you want Mason to install
   })
@@ -931,7 +935,7 @@ do
       json = { 'prettierd', 'prettier', stop_after_first = true },
       css = { 'prettierd', 'prettier', stop_after_first = true },
       html = { 'prettierd', 'prettier', stop_after_first = true },
-      python = { 'ruff' },
+      python = { 'ruff_format' },
       c = { 'clang-format' },
     },
   }
