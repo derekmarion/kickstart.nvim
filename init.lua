@@ -125,7 +125,7 @@ do
   vim.schedule(function() vim.o.clipboard = 'unnamedplus' end)
 
   -- Use OSC52 over SSH for better clipboard support
-  if vim.env.SSH_CONNECTION or (not vim.env.DISPLAY and not vim.env.WAYLAND_DISPLAY) then vim.g.clipboard = 'osc52' end
+  if vim.env.SSH_CONNECTION then vim.g.clipboard = 'osc52' end
 
   -- Enable break indent
   vim.o.breakindent = true
