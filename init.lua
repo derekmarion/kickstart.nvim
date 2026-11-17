@@ -504,7 +504,7 @@ do
           { hl = 'MiniStatuslineFilename', strings = { filename } },
           '%=',
           { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-          { hl = mode_hl, strings = { location } },
+          { hl = mode_hl, strings = { location, os.date('%H:%M') } },
         }
       end,
     },
@@ -513,7 +513,7 @@ do
   -- cursor location to LINE:COLUMN
   ---@diagnostic disable-next-line: duplicate-set-field
   statusline.section_location = function() return '%2l:%-2v' end
-
+  vim.fn.timer_start(1000, function() vim.cmd 'redrawstatus' end, { ['repeat'] = -1 })
   -- ... and there is more!
   --  Check out: https://github.com/nvim-mini/mini.nvim
 
