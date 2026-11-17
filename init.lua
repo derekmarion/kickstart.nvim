@@ -504,7 +504,8 @@ do
           { hl = 'MiniStatuslineFilename', strings = { filename } },
           '%=',
           { hl = 'MiniStatuslineFileinfo', strings = { fileinfo } },
-          { hl = mode_hl, strings = { location, os.date('%H:%M') } },
+          { hl = mode_hl, strings = { location } },
+          { hl = 'MiniStatuslineDevinfo', strings = { os.date('%H:%M') } },
         }
       end,
     },
